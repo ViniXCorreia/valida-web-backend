@@ -13,6 +13,7 @@ export class ClienteService {
   }
 
   findOne(id: number) {
+    if
     return `This action returns a #${id} cliente`;
   }
 
