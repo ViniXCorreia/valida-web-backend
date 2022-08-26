@@ -7,6 +7,8 @@ import { PropostaComercialController } from './proposta-comercial/proposta-comer
 import { PropostaComercialModule } from './proposta-comercial/proposta-comercial.module';
 import { UsuarioController } from './usuario/usuario.controller';
 import { UsuarioModule } from './usuario/usuario.module';
+import { AuditModule } from './audit/audit.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -15,6 +17,7 @@ import { UsuarioModule } from './usuario/usuario.module';
     ClienteModule,
     UsuarioModule,
     PropostaComercialModule,
+    AuditModule,
   ],
   controllers: [
     ClienteController,
