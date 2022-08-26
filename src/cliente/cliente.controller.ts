@@ -11,31 +11,31 @@ import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 
-@Controller('cliente')
+@Controller()
 export class ClienteController {
   constructor(private readonly clienteService: ClienteService) {}
 
-  @Post()
+  @Post('/client')
   create(@Body() createClienteDto: CreateClienteDto) {
     return this.clienteService.create(createClienteDto);
   }
 
-  @Get()
+  @Get('/clients')
   findAll() {
     return this.clienteService.findAll();
   }
 
-  @Get(':id')
+  @Get('/client/:id')
   findOne(@Param('id') id: string) {
     return this.clienteService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('/client/:id')
   update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
     return this.clienteService.update(+id, updateClienteDto);
   }
 
-  @Delete(':id')
+  @Delete('/client/:id')
   remove(@Param('id') id: string) {
     return this.clienteService.remove(+id);
   }

@@ -13,7 +13,7 @@ export class ClienteRepoService {
   ) {}
 
   async create(clienteDto: CreateClienteDto): Promise<ClienteEntity> {
-    return await this.clienteRepository.create(clienteDto);
+    return await this.clienteRepository.save(clienteDto);
   }
 
   async findById(id: number): Promise<ClienteEntity> {
@@ -22,6 +22,12 @@ export class ClienteRepoService {
 
   async findAll(): Promise<ClienteEntity[]> {
     return await this.clienteRepository.find();
+  }
+
+  async findByDocument(document: string): Promise<ClienteEntity> {
+    return await this.clienteRepository.findOne({
+      where: { document: document },
+    });
   }
 
   async delete(id: number): Promise<boolean> {
@@ -33,7 +39,9 @@ export class ClienteRepoService {
     }
   }
 
-  async update(updateClienteDto: UpdateClienteDto): Promise<any> {
-    return this.clienteRepository.save(updateClienteDto);
+  async update(id: number, updateClienteDto: UpdateClienteDto): Promise<any> {
+    return this.clienteRepository.update(id, {
+      name: updateClienteDto.name,
+    });
   }
 }

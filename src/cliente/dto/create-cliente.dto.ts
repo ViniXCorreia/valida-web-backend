@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class CreateClienteDto {
   @IsString()
@@ -6,4 +6,10 @@ export class CreateClienteDto {
 
   @IsString()
   document: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  phone: string;
 }
