@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ClienteEntity } from 'src/cliente/entities/cliente.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UsuarioEnum } from '../enum/usuario.enum';
 
 @Entity({ name: 'usuario' })
@@ -17,4 +18,9 @@ export class UsuarioEntity {
 
   @Column()
   type: UsuarioEnum;
+
+  @OneToMany(() => ClienteEntity, (clientes) => clientes.internalResponsible, {
+    eager: true,
+  })
+  clientes: ClienteEntity[];
 }

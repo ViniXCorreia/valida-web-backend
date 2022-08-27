@@ -39,9 +39,13 @@ export class ClienteRepoService {
     }
   }
 
-  async update(id: number, updateClienteDto: UpdateClienteDto): Promise<any> {
-    return this.clienteRepository.update(id, {
-      name: updateClienteDto.name,
-    });
+  async update(
+    id: number,
+    updateClienteDto: UpdateClienteDto,
+  ): Promise<ClienteEntity> {
+    let updateClient = new ClienteEntity();
+    updateClient = Object.assign(updateClient, updateClienteDto);
+    await this.clienteRepository.update(id, updateClient);
+    return await this.findById(id);
   }
 }

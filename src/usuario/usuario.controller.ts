@@ -13,6 +13,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { updatePasswordDto } from './dto/update-password.dto';
 import { FindByEmailDto } from './dto/find-by-email.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller()
 export class UsuarioController {
@@ -21,6 +22,11 @@ export class UsuarioController {
   @Post('/usuario')
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuarioService.create(createUsuarioDto);
+  }
+
+  @Post('/usuario/login')
+  login(@Body() loginDto: LoginDto) {
+    return this.usuarioService.login(loginDto);
   }
 
   @Get('/usuarios')

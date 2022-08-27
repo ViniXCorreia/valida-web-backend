@@ -1,5 +1,12 @@
 import { PropostaComercialEntity } from 'src/proposta-comercial/entities/proposta-comercial.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'cliente' })
 export class ClienteEntity {
@@ -18,10 +25,14 @@ export class ClienteEntity {
   @Column()
   phone: string;
 
-  //TODO RESPONSÁVEIS PELA EMPRESA
+  @Column()
+  responsiblePerson: string;
+
+  @ManyToOne(() => UsuarioEntity, (usuario) => usuario.clientes)
+  internalResponsible?: UsuarioEntity;
 
   @OneToMany(() => PropostaComercialEntity, (proposta) => proposta.cliente, {
-    cascade: true,
+    cascade: ['remove'],
   })
   propostas: PropostaComercialEntity[];
 }

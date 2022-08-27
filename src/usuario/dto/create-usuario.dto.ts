@@ -18,7 +18,7 @@ export class CreateUsuarioDto {
   @MinLength(8, {
     message: 'A senha tem que ter ao menos 8 caracteres',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Campo senha é obrigatório!' })
   password: string;
 
   @IsEnum(UsuarioEnum, { message: 'Tipo de usuário não encontrado!' })
