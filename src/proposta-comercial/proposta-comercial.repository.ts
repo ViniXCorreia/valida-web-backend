@@ -33,11 +33,13 @@ export class PropostaComercialRepoService {
   async update(
     id: number,
     updatePropostaComercialDto: UpdatePropostaComercialDto,
-  ): Promise<any> {
-    return await this.propostaComercialRepoService.update(
-      id,
-      updatePropostaComercialDto,
-    );
+  ): Promise<PropostaComercialEntity> {
+    let updateProposta = new PropostaComercialEntity();
+    updateProposta = Object.assign(updateProposta, updateProposta);
+
+    await this.propostaComercialRepoService.update(id, updateProposta);
+
+    return await this.findOneById(id);
   }
 
   async delete(id: number): Promise<boolean> {

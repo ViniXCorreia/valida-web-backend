@@ -1,4 +1,5 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 
 export class CreateClienteDto {
   @IsString()
@@ -12,4 +13,9 @@ export class CreateClienteDto {
 
   @IsString()
   phone: string;
+
+  @IsString()
+  responsiblePerson: string;
+
+  internalResponsible?: UsuarioEntity;
 }

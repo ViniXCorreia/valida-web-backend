@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
+import { UsuarioRepoService } from 'src/usuario/usuario.repository';
 import { ClienteRepoService } from './cliente.repository';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
