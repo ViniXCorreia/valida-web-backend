@@ -32,16 +32,16 @@ export class UsuarioService {
     return await this.usuarioRepoService.create(createUsuarioDto);
   }
 
-  async login(loginDto: LoginDto): Promise<boolean> {
+  async login(loginDto: LoginDto): Promise<UsuarioEntity> {
     let findUser = await this.usuarioRepoService.findByEmail(loginDto.email);
     if (!findUser) {
-      throw new UnauthorizedException('Usuário ou Senha Incorretos!');
+      throw new UnauthorizedException('Usuário não encontrado!');
     }
     const loginPassword = await this.hasher(loginDto.password);
     if (loginPassword !== findUser.password) {
       throw new UnauthorizedException('Usuário ou senha Incorretos!');
     }
-    return true;
+    return findUser;
   }
 
   async findAll(): Promise<UsuarioEntity[]> {
