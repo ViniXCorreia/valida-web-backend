@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { updatePasswordDto } from './dto/update-password.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
 
@@ -13,7 +14,7 @@ export class UsuarioRepoService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioEntity> {
-    return await this.usuarioRepoService.create(createUsuarioDto);
+    return await this.usuarioRepoService.save(createUsuarioDto);
   }
 
   async findById(id: number): Promise<UsuarioEntity> {
@@ -30,16 +31,24 @@ export class UsuarioRepoService {
     });
   }
 
-  async update(updateUsuarioDto: UpdateUsuarioDto): Promise<any> {
-    return await this.usuarioRepoService.save(updateUsuarioDto);
+  async update(
+    id: number,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<UsuarioEntity> {
+    let updateUser = new UsuarioEntity();
+    updateUser = Object.assign(updateUser, updateUsuarioDto);
+
+    await this.usuarioRepoService.update(id, updateUser);
+
+    return await this.findById(id);
   }
 
   async updatePassword(
     id: number,
-    updateUsuarioDto: UpdateUsuarioDto,
+    updatePasswordDto: updatePasswordDto,
   ): Promise<any> {
     return await this.usuarioRepoService.update(id, {
-      password: updateUsuarioDto.password,
+      password: updatePasswordDto.password,
     });
   }
 

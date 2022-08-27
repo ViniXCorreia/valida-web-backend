@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { ClienteEntity } from 'src/cliente/entities/cliente.entity';
 import { ManyToOne } from 'typeorm';
 
@@ -9,6 +9,6 @@ export class CreatePropostaComercialDto {
   @IsString()
   status: string = 'open';
 
-  @ManyToOne(() => ClienteEntity, (cliente) => cliente.propostas)
-  cliente: ClienteEntity;
+  @IsNumber()
+  clienteId: number;
 }

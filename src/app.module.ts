@@ -20,7 +20,7 @@ import { AuditModule } from './audit/audit.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       synchronize: false,
-      logging: false,
+      logging: true,
       entities: ['./dist/**/entities/*.entity.{js,ts}'],
       migrations: ['src/migration/**/*.js'],
       subscribers: ['src/subscriber/**/*.{js,ts}'],
