@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
@@ -16,7 +17,8 @@ export class ClienteController {
   constructor(private readonly clienteService: ClienteService) {}
 
   @Post('/client')
-  create(@Body() createClienteDto: CreateClienteDto) {
+  create(@Body() createClienteDto: CreateClienteDto, @Request() req) {
+    const reqUser = req.userId;
     return this.clienteService.create(createClienteDto);
   }
 

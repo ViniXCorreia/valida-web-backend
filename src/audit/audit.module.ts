@@ -7,6 +7,6 @@ import { AuditEntity } from './entities/audit.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([AuditEntity])],
   providers: [AuditService, AuditRepoService],
-  exports: [AuditService],
+  exports: [AuditService, AuditRepoService],
 })
 export class AuditModule {}

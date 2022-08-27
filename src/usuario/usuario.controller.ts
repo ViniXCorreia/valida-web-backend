@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Put,
+  Request,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -20,7 +21,8 @@ export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Post('/usuario')
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  create(@Body() createUsuarioDto: CreateUsuarioDto, @Request() req) {
+    const reqUser = req.userId;
     return this.usuarioService.create(createUsuarioDto);
   }
 

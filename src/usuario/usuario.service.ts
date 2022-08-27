@@ -5,6 +5,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { AuditRepoService } from 'src/audit/audit.repository';
+import { CreateLogDto } from 'src/audit/dto/create-log.dto';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { FindByEmailDto } from './dto/find-by-email.dto';
 import { LoginDto } from './dto/login.dto';
@@ -18,6 +20,8 @@ export class UsuarioService {
   constructor(
     @Inject(UsuarioRepoService)
     private readonly usuarioRepoService: UsuarioRepoService,
+    @Inject(AuditRepoService)
+    private readonly auditRepoService: AuditRepoService,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioEntity> {
@@ -29,6 +33,12 @@ export class UsuarioService {
     }
     const hashPassword = await this.hasher(createUsuarioDto.password);
     createUsuarioDto.password = hashPassword;
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'USUARIO';
+    auditItem.action = 'CREATE_USER';
+    auditItem.idTable = null;
+
     return await this.usuarioRepoService.create(createUsuarioDto);
   }
 
