@@ -21,6 +21,7 @@ import { JwtAuthGuard } from 'src/auth/shared/jwt-auth.guard';
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/usuario')
   create(@Body() createUsuarioDto: CreateUsuarioDto, @Request() req) {
     const reqUser = req.userId;
@@ -39,21 +40,25 @@ export class UsuarioController {
     return this.usuarioService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/usuario/email')
   findEmail(@Body() email: string) {
     return this.usuarioService.findByEmail(email);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/usuario/:id')
   findOne(@Param('id') id: string) {
     return this.usuarioService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/usuario/:id')
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.update(+id, updateUsuarioDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/usuario/:id')
   updatePassword(
     @Param('id') id: string,
@@ -62,6 +67,7 @@ export class UsuarioController {
     return this.usuarioService.updatePasword(+id, updatePasswordDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/usuario/:id')
   remove(@Param('id') id: string) {
     return this.usuarioService.remove(+id);

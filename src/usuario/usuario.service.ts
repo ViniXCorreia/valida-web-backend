@@ -95,7 +95,7 @@ export class UsuarioService {
 
     if (findUser.clientes.length > 0) {
       throw new UnauthorizedException(
-        'Não é possível excluir usuário com propostas abertas!',
+        'Não é possível excluir usuário responsável por clientes!',
       );
     }
     return await this.usuarioRepoService.delete(id);
