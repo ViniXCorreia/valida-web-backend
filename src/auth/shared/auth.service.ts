@@ -12,8 +12,9 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<UsuarioEntity> {
+    const hashPassword = await this.hasher(password);
     const user = await this.userService.findByEmail(email);
-    if (user && user.password === password) {
+    if (user && user.password === hashPassword) {
       const { id, name, email } = user;
       return user;
     }
@@ -23,5 +24,12 @@ export class AuthService {
 
   async login(user: UsuarioEntity): Promise<string> {
     return await this.jwtService.signAsync({ user });
+  }
+
+  hasher(text: string): Promise<string> {
+    const crypto = require('crypto');
+    const sha256Hash = crypto.createHash('sha256');
+    const hashPassword = sha256Hash.update(text).digest('hex');
+    return hashPassword;
   }
 }
