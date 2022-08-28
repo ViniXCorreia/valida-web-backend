@@ -31,8 +31,6 @@ export class ClienteEntity {
   @ManyToOne(() => UsuarioEntity, (usuario) => usuario.clientes)
   internalResponsible: UsuarioEntity;
 
-  @OneToMany(() => PropostaComercialEntity, (proposta) => proposta.cliente, {
-    cascade: ['remove'],
-  })
+  @OneToMany(() => PropostaComercialEntity, (proposta) => proposta.cliente)
   propostas: PropostaComercialEntity[];
 }

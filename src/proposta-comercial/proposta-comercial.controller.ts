@@ -14,14 +14,14 @@ import { CreatePropostaComercialDto } from './dto/create-proposta-comercial.dto'
 import { UpdatePropostaComercialDto } from './dto/update-proposta-comercial.dto';
 import { JwtAuthGuard } from 'src/auth/shared/jwt-auth.guard';
 
-@Controller('proposta-comercial')
+@Controller()
 export class PropostaComercialController {
   constructor(
     private readonly propostaComercialService: PropostaComercialService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('/proposta')
   create(
     @Body() createPropostaComercialDto: CreatePropostaComercialDto,
     @Request() req,
@@ -34,19 +34,19 @@ export class PropostaComercialController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('/propostas')
   findAll() {
     return this.propostaComercialService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
+  @Get('/proposta/:id')
   findOne(@Param('id') id: string) {
     return this.propostaComercialService.findOne(+id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Patch('/proposta/:id')
   update(
     @Param('id') id: string,
     @Body() updatePropostaComercialDto: UpdatePropostaComercialDto,
@@ -61,7 +61,7 @@ export class PropostaComercialController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('/proposta/:id')
   remove(@Param('id') id: string, @Request() req) {
     const reqUser = req.user;
     return this.propostaComercialService.remove(reqUser, +id);

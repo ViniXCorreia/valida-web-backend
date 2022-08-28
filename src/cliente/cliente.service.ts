@@ -38,7 +38,7 @@ export class ClienteService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'CLIENTE';
     auditItem.action = 'CREATE_CLIENTE';
-    auditItem.idTable = createdClient.id;
+    auditItem.idInTable = createdClient.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 
@@ -77,7 +77,7 @@ export class ClienteService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'CLIENTE';
     auditItem.action = 'UPDATE_CLIENTE';
-    auditItem.idTable = findClient.id;
+    auditItem.idInTable = findClient.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 
@@ -95,7 +95,7 @@ export class ClienteService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'CLIENTE';
     auditItem.action = 'DELETE_CLIENTE';
-    auditItem.idTable = findClient.id;
+    auditItem.idInTable = findClient.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 

@@ -8,5 +8,5 @@ export class CreatePropostaComercialDto {
   @IsString()
   status: string = 'open';
 
-  clienteId: ClienteEntity;
+  cliente?: ClienteEntity;
 }

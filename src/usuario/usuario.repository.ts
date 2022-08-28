@@ -43,12 +43,9 @@ export class UsuarioRepoService {
     return await this.findById(id);
   }
 
-  async updatePassword(
-    id: number,
-    updatePasswordDto: updatePasswordDto,
-  ): Promise<any> {
+  async updatePassword(id: number, updatePassword: string): Promise<any> {
     return await this.usuarioRepoService.update(id, {
-      password: updatePasswordDto.password,
+      password: updatePassword,
     });
   }
 

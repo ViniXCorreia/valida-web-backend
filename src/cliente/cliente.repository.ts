@@ -31,12 +31,8 @@ export class ClienteRepoService {
   }
 
   async delete(id: number): Promise<boolean> {
-    try {
-      await this.clienteRepository.delete(id);
-      return true;
-    } catch (error) {
-      throw error.message();
-    }
+    await this.clienteRepository.delete(id);
+    return true;
   }
 
   async update(

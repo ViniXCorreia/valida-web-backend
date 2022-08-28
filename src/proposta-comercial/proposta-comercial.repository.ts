@@ -35,7 +35,7 @@ export class PropostaComercialRepoService {
     updatePropostaComercialDto: UpdatePropostaComercialDto,
   ): Promise<PropostaComercialEntity> {
     let updateProposta = new PropostaComercialEntity();
-    updateProposta = Object.assign(updateProposta, updateProposta);
+    updateProposta = Object.assign(updateProposta, updatePropostaComercialDto);
 
     await this.propostaComercialRepoService.update(id, updateProposta);
 

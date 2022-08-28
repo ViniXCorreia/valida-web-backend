@@ -3,7 +3,7 @@ export class CreateLogDto {
 
   action: string;
 
-  idTable: number;
+  idInTable: number;
 
   userId: number;
 

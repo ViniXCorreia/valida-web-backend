@@ -25,7 +25,7 @@ export class PropostaComercialService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'PROPOSTA-COMERCIAL';
     auditItem.action = 'CREATE_PRPOSTA';
-    auditItem.idTable = createdProposta.id;
+    auditItem.idInTable = createdProposta.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 
@@ -39,7 +39,11 @@ export class PropostaComercialService {
   }
 
   async findOne(id: number): Promise<PropostaComercialEntity> {
-    return await this.propostaComercialRepoService.findOneById(id);
+    let findProposta = await this.propostaComercialRepoService.findOneById(id);
+    if (!findProposta) {
+      throw new NotFoundException('Proposta Comercial não encontrada!');
+    }
+    return findProposta;
   }
 
   async update(
@@ -55,7 +59,7 @@ export class PropostaComercialService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'PROPOSTA-COMERCIAL';
     auditItem.action = 'UPDATE_PROPOSTA';
-    auditItem.idTable = findProposta.id;
+    auditItem.idInTable = findProposta.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 
@@ -76,7 +80,7 @@ export class PropostaComercialService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'PROPOSTA-COMERCIAL';
     auditItem.action = 'DELETE_PROPOSTA';
-    auditItem.idTable = findProposta.id;
+    auditItem.idInTable = findProposta.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 

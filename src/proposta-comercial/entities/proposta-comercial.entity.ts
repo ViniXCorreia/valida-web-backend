@@ -21,6 +21,8 @@ export class PropostaComercialEntity {
   @Column()
   status: string;
 
-  @ManyToOne(() => ClienteEntity, (cliente) => cliente.propostas)
+  @ManyToOne(() => ClienteEntity, (cliente) => cliente.propostas, {
+    onDelete: 'CASCADE',
+  })
   cliente: ClienteEntity;
 }

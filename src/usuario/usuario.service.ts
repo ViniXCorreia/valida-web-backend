@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -45,7 +46,7 @@ export class UsuarioService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'USUARIO';
     auditItem.action = 'CREATE_USER';
-    auditItem.idTable = createdUser.id;
+    auditItem.idInTable = createdUser.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
 
@@ -85,10 +86,12 @@ export class UsuarioService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'USUARIO';
     auditItem.action = 'UPDATE_USER';
-    auditItem.idTable = findUser.id;
+    auditItem.idInTable = findUser.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
     await this.auditService.create(auditItem);
+
+    updateUsuarioDto.password = findUser.password;
 
     return await this.usuarioRepoService.update(findUser.id, updateUsuarioDto);
   }
@@ -111,27 +114,29 @@ export class UsuarioService {
       throw new NotFoundException('Usuário não encontrado!');
     }
 
+    let updatePassword = await this.hasher(updatePasswordDto.password);
+
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'USUARIO';
-    auditItem.action = 'UPDATE_PASSWORD';
-    auditItem.idTable = findUser.id;
+    auditItem.action = 'UPDATE_USER_PASSWORD';
+    auditItem.idInTable = findUser.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
     await this.auditService.create(auditItem);
 
-    await this.usuarioRepoService.updatePassword(id, updatePasswordDto);
+    await this.usuarioRepoService.updatePassword(id, updatePassword);
 
     return await this.usuarioRepoService.findById(id);
   }
 
   async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
     let findUser = await this.usuarioRepoService.findById(id);
-    if (findUser) {
+    if (!findUser) {
       throw new NotFoundException('Usuário não encontrado!');
     }
 
     if (findUser.clientes.length > 0) {
-      throw new UnauthorizedException(
+      throw new BadRequestException(
         'Não é possível excluir usuário responsável por clientes!',
       );
     }
@@ -139,7 +144,7 @@ export class UsuarioService {
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'USUARIO';
     auditItem.action = 'DELETE_USER';
-    auditItem.idTable = findUser.id;
+    auditItem.idInTable = findUser.id;
     auditItem.userId = reqUser.id;
     auditItem.userName = reqUser.name;
     await this.auditService.create(auditItem);

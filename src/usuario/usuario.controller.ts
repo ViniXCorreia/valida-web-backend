@@ -16,6 +16,7 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { updatePasswordDto } from './dto/update-password.dto';
 import { LocalAuthGuard } from 'src/auth/shared/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/shared/jwt-auth.guard';
+import { FindByEmailDto } from './dto/find-by-email.dto';
 
 @Controller()
 export class UsuarioController {
@@ -42,8 +43,8 @@ export class UsuarioController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/usuario/email')
-  findEmail(@Body() email: string) {
-    return this.usuarioService.findByEmail(email);
+  findEmail(@Body() findByEmailDto: FindByEmailDto) {
+    return this.usuarioService.findByEmail(findByEmailDto.email);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -56,22 +57,22 @@ export class UsuarioController {
   @Put('/usuario/:id')
   update(
     @Param('id') id: string,
-    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @Body() updatePasswordDto: updatePasswordDto,
     @Request() req,
   ) {
     const reqUser = req.user;
-    return this.usuarioService.update(reqUser, +id, updateUsuarioDto);
+    return this.usuarioService.updatePasword(reqUser, +id, updatePasswordDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/usuario/:id')
   updatePassword(
     @Param('id') id: string,
-    @Body() updatePasswordDto: updatePasswordDto,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
     @Request() req,
   ) {
     const reqUser = req.user;
-    return this.usuarioService.updatePasword(reqUser, +id, updatePasswordDto);
+    return this.usuarioService.update(reqUser, +id, updateUsuarioDto);
   }
 
   @UseGuards(JwtAuthGuard)
