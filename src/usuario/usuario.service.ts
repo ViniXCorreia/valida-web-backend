@@ -7,8 +7,10 @@ import {
 } from '@nestjs/common';
 import { AuditRepoService } from 'src/audit/audit.repository';
 import { CreateLogDto } from 'src/audit/dto/create-log.dto';
+import { AuthService } from 'src/auth/shared/auth.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { FindByEmailDto } from './dto/find-by-email.dto';
+import { LoginUserResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { updatePasswordDto } from './dto/update-password.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -22,6 +24,7 @@ export class UsuarioService {
     private readonly usuarioRepoService: UsuarioRepoService,
     @Inject(AuditRepoService)
     private readonly auditRepoService: AuditRepoService,
+    private authService: AuthService,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioEntity> {
@@ -42,16 +45,9 @@ export class UsuarioService {
     return await this.usuarioRepoService.create(createUsuarioDto);
   }
 
-  async login(loginDto: LoginDto): Promise<UsuarioEntity> {
-    let findUser = await this.usuarioRepoService.findByEmail(loginDto.email);
-    if (!findUser) {
-      throw new UnauthorizedException('Usuário não encontrado!');
-    }
-    const loginPassword = await this.hasher(loginDto.password);
-    if (loginPassword !== findUser.password) {
-      throw new UnauthorizedException('Usuário ou senha Incorretos!');
-    }
-    return findUser;
+  async login(loginUser: UsuarioEntity): Promise<LoginUserResponseDto> {
+    const accessToken: string = await this.authService.login(loginUser);
+    return { accessToken };
   }
 
   async findAll(): Promise<UsuarioEntity[]> {
@@ -75,8 +71,8 @@ export class UsuarioService {
     return await this.usuarioRepoService.update(findUser.id, updateUsuarioDto);
   }
 
-  async findByEmail(findByEmail: FindByEmailDto): Promise<UsuarioEntity> {
-    let findUser = await this.usuarioRepoService.findByEmail(findByEmail.email);
+  async findByEmail(email: string): Promise<UsuarioEntity> {
+    let findUser = await this.usuarioRepoService.findByEmail(email);
     if (!findUser) {
       throw new NotFoundException('Usuario não encontrado!');
     }

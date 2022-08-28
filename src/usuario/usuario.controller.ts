@@ -8,13 +8,14 @@ import {
   Delete,
   Put,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { updatePasswordDto } from './dto/update-password.dto';
-import { FindByEmailDto } from './dto/find-by-email.dto';
-import { LoginDto } from './dto/login.dto';
+import { LocalAuthGuard } from 'src/auth/shared/local-auth.guard';
+import { JwtAuthGuard } from 'src/auth/shared/jwt-auth.guard';
 
 @Controller()
 export class UsuarioController {
@@ -26,18 +27,20 @@ export class UsuarioController {
     return this.usuarioService.create(createUsuarioDto);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('/usuario/login')
-  login(@Body() loginDto: LoginDto) {
-    return this.usuarioService.login(loginDto);
+  async login(@Request() req: any) {
+    return await this.usuarioService.login(req.user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/usuarios')
   findAll() {
     return this.usuarioService.findAll();
   }
 
   @Get('/usuario/email')
-  findEmail(@Body() email: FindByEmailDto) {
+  findEmail(@Body() email: string) {
     return this.usuarioService.findByEmail(email);
   }
 
