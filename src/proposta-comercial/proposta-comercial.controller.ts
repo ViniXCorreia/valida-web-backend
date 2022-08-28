@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PropostaComercialService } from './proposta-comercial.service';
 import { CreatePropostaComercialDto } from './dto/create-proposta-comercial.dto';
@@ -21,8 +22,15 @@ export class PropostaComercialController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPropostaComercialDto: CreatePropostaComercialDto) {
-    return this.propostaComercialService.create(createPropostaComercialDto);
+  create(
+    @Body() createPropostaComercialDto: CreatePropostaComercialDto,
+    @Request() req,
+  ) {
+    const reqUser = req.user;
+    return this.propostaComercialService.create(
+      reqUser,
+      createPropostaComercialDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -42,8 +50,11 @@ export class PropostaComercialController {
   update(
     @Param('id') id: string,
     @Body() updatePropostaComercialDto: UpdatePropostaComercialDto,
+    @Request() req,
   ) {
+    const reqUser = req.user;
     return this.propostaComercialService.update(
+      reqUser,
       +id,
       updatePropostaComercialDto,
     );
@@ -51,7 +62,8 @@ export class PropostaComercialController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.propostaComercialService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    const reqUser = req.user;
+    return this.propostaComercialService.remove(reqUser, +id);
   }
 }

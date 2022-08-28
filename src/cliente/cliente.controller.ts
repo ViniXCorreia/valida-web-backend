@@ -21,8 +21,8 @@ export class ClienteController {
   @UseGuards(JwtAuthGuard)
   @Post('/client')
   create(@Body() createClienteDto: CreateClienteDto, @Request() req) {
-    const reqUser = req.userId;
-    return this.clienteService.create(createClienteDto);
+    const reqUser = req.user;
+    return this.clienteService.create(reqUser, createClienteDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -39,13 +39,19 @@ export class ClienteController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/client/:id')
-  update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
-    return this.clienteService.update(+id, updateClienteDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateClienteDto: UpdateClienteDto,
+    @Request() req,
+  ) {
+    const reqUser = req.user;
+    return this.clienteService.update(reqUser, +id, updateClienteDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/client/:id')
-  remove(@Param('id') id: string) {
-    return this.clienteService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    const reqUser = req.user;
+    return this.clienteService.remove(reqUser, +id);
   }
 }

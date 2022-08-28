@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuditRepoService } from 'src/audit/audit.repository';
+import { AuditService } from 'src/audit/audit.service';
 import { CreateLogDto } from 'src/audit/dto/create-log.dto';
 import { AuthService } from 'src/auth/shared/auth.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -22,12 +23,14 @@ export class UsuarioService {
   constructor(
     @Inject(UsuarioRepoService)
     private readonly usuarioRepoService: UsuarioRepoService,
-    @Inject(AuditRepoService)
-    private readonly auditRepoService: AuditRepoService,
+    private readonly auditService: AuditService,
     private authService: AuthService,
   ) {}
 
-  async create(createUsuarioDto: CreateUsuarioDto): Promise<UsuarioEntity> {
+  async create(
+    reqUser: UsuarioEntity,
+    createUsuarioDto: CreateUsuarioDto,
+  ): Promise<UsuarioEntity> {
     let findUser = await this.usuarioRepoService.findByEmail(
       createUsuarioDto.email,
     );
@@ -37,12 +40,18 @@ export class UsuarioService {
     const hashPassword = await this.hasher(createUsuarioDto.password);
     createUsuarioDto.password = hashPassword;
 
+    let createdUser = await this.usuarioRepoService.create(createUsuarioDto);
+
     let auditItem = new CreateLogDto();
     auditItem.tableName = 'USUARIO';
     auditItem.action = 'CREATE_USER';
-    auditItem.idTable = null;
+    auditItem.idTable = createdUser.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
 
-    return await this.usuarioRepoService.create(createUsuarioDto);
+    await this.auditService.create(auditItem);
+
+    return createdUser;
   }
 
   async login(loginUser: UsuarioEntity): Promise<LoginUserResponseDto> {
@@ -63,11 +72,24 @@ export class UsuarioService {
     return findUser;
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto): Promise<any> {
+  async update(
+    reqUser: UsuarioEntity,
+    id: number,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<any> {
     let findUser = await this.usuarioRepoService.findById(id);
     if (!findUser) {
       throw new NotFoundException('Usuário não encontrado!');
     }
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'USUARIO';
+    auditItem.action = 'UPDATE_USER';
+    auditItem.idTable = findUser.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+    await this.auditService.create(auditItem);
+
     return await this.usuarioRepoService.update(findUser.id, updateUsuarioDto);
   }
 
@@ -79,15 +101,30 @@ export class UsuarioService {
     return findUser;
   }
 
-  async updatePasword(id: number, updatePasswordDto: updatePasswordDto) {
+  async updatePasword(
+    reqUser: UsuarioEntity,
+    id: number,
+    updatePasswordDto: updatePasswordDto,
+  ) {
     let findUser = await this.usuarioRepoService.findById(id);
-    if (findUser) {
+    if (!findUser) {
       throw new NotFoundException('Usuário não encontrado!');
     }
-    return await this.usuarioRepoService.updatePassword(id, updatePasswordDto);
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'USUARIO';
+    auditItem.action = 'UPDATE_PASSWORD';
+    auditItem.idTable = findUser.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+    await this.auditService.create(auditItem);
+
+    await this.usuarioRepoService.updatePassword(id, updatePasswordDto);
+
+    return await this.usuarioRepoService.findById(id);
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
     let findUser = await this.usuarioRepoService.findById(id);
     if (findUser) {
       throw new NotFoundException('Usuário não encontrado!');
@@ -98,6 +135,15 @@ export class UsuarioService {
         'Não é possível excluir usuário responsável por clientes!',
       );
     }
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'USUARIO';
+    auditItem.action = 'DELETE_USER';
+    auditItem.idTable = findUser.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+    await this.auditService.create(auditItem);
+
     return await this.usuarioRepoService.delete(id);
   }
 

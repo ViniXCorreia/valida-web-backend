@@ -4,6 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { AuditRepoService } from 'src/audit/audit.repository';
+import { AuditService } from 'src/audit/audit.service';
+import { CreateLogDto } from 'src/audit/dto/create-log.dto';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 import { UsuarioRepoService } from 'src/usuario/usuario.repository';
 import { ClienteRepoService } from './cliente.repository';
@@ -16,8 +19,12 @@ export class ClienteService {
   constructor(
     @Inject(ClienteRepoService)
     private readonly clienteRepoService: ClienteRepoService,
+    private readonly auditService: AuditService,
   ) {}
-  async create(createClienteDto: CreateClienteDto): Promise<ClienteEntity> {
+  async create(
+    reqUser: UsuarioEntity,
+    createClienteDto: CreateClienteDto,
+  ): Promise<ClienteEntity> {
     let findClient = await this.clienteRepoService.findByDocument(
       createClienteDto.document,
     );
@@ -26,7 +33,18 @@ export class ClienteService {
       throw new ConflictException('Já existe um cliente com esse documento!');
     }
 
-    return await this.clienteRepoService.create(createClienteDto);
+    let createdClient = await this.clienteRepoService.create(createClienteDto);
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'CLIENTE';
+    auditItem.action = 'CREATE_CLIENTE';
+    auditItem.idTable = createdClient.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+
+    await this.auditService.create(auditItem);
+
+    return createdClient;
   }
 
   async findAll(): Promise<ClienteEntity[]> {
@@ -46,6 +64,7 @@ export class ClienteService {
   }
 
   async update(
+    reqUser: UsuarioEntity,
     id: number,
     updateClienteDto: UpdateClienteDto,
   ): Promise<ClienteEntity> {
@@ -55,14 +74,33 @@ export class ClienteService {
     }
     await this.clienteRepoService.update(id, updateClienteDto);
 
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'CLIENTE';
+    auditItem.action = 'UPDATE_CLIENTE';
+    auditItem.idTable = findClient.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+
+    await this.auditService.create(auditItem);
+
     return await this.clienteRepoService.findById(id);
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
     let findClient = await this.clienteRepoService.findById(id);
     if (!findClient) {
       throw new NotFoundException('Usuário não encontrado!');
     }
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'CLIENTE';
+    auditItem.action = 'DELETE_CLIENTE';
+    auditItem.idTable = findClient.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+
+    await this.auditService.create(auditItem);
+
     return await this.clienteRepoService.delete(id);
   }
 }

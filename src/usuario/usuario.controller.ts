@@ -23,9 +23,9 @@ export class UsuarioController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/usuario')
-  create(@Body() createUsuarioDto: CreateUsuarioDto, @Request() req) {
-    const reqUser = req.userId;
-    return this.usuarioService.create(createUsuarioDto);
+  create(@Body() createUsuarioDto: CreateUsuarioDto, @Request() req: any) {
+    const reqUser = req.user;
+    return this.usuarioService.create(reqUser, createUsuarioDto);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -54,8 +54,13 @@ export class UsuarioController {
 
   @UseGuards(JwtAuthGuard)
   @Put('/usuario/:id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuarioService.update(+id, updateUsuarioDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @Request() req,
+  ) {
+    const reqUser = req.user;
+    return this.usuarioService.update(reqUser, +id, updateUsuarioDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -63,13 +68,16 @@ export class UsuarioController {
   updatePassword(
     @Param('id') id: string,
     @Body() updatePasswordDto: updatePasswordDto,
+    @Request() req,
   ) {
-    return this.usuarioService.updatePasword(+id, updatePasswordDto);
+    const reqUser = req.user;
+    return this.usuarioService.updatePasword(reqUser, +id, updatePasswordDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/usuario/:id')
-  remove(@Param('id') id: string) {
-    return this.usuarioService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    const reqUser = req.user;
+    return this.usuarioService.remove(reqUser, +id);
   }
 }

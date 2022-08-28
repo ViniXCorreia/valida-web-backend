@@ -14,7 +14,7 @@ export class PropostaComercialRepoService {
 
   async create(
     createPropostaComercialDto: CreatePropostaComercialDto,
-  ): Promise<CreatePropostaComercialDto> {
+  ): Promise<PropostaComercialEntity> {
     return await this.propostaComercialRepoService.save(
       createPropostaComercialDto,
     );

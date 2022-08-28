@@ -17,7 +17,7 @@ export class AuditEntity {
   action: string;
 
   @Column({ nullable: true })
-  idTable: number;
+  idInTable: number;
 
   @Column()
   userId: number;
