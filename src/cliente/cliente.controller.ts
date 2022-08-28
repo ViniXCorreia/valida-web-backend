@@ -38,6 +38,13 @@ export class ClienteController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/client/:id/propostas')
+  getPropostas(@Param('id') id: string, @Request() req) {
+    const reqUser = req.user;
+    return this.clienteService.getPropostas(reqUser, +id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('/client/:id')
   update(
     @Param('id') id: string,

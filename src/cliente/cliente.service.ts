@@ -7,6 +7,7 @@ import {
 import { AuditRepoService } from 'src/audit/audit.repository';
 import { AuditService } from 'src/audit/audit.service';
 import { CreateLogDto } from 'src/audit/dto/create-log.dto';
+import { PropostaComercialService } from 'src/proposta-comercial/proposta-comercial.service';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 import { UsuarioRepoService } from 'src/usuario/usuario.repository';
 import { ClienteRepoService } from './cliente.repository';
@@ -20,6 +21,7 @@ export class ClienteService {
     @Inject(ClienteRepoService)
     private readonly clienteRepoService: ClienteRepoService,
     private readonly auditService: AuditService,
+    private readonly propostaService: PropostaComercialService,
   ) {}
   async create(
     reqUser: UsuarioEntity,
@@ -102,5 +104,23 @@ export class ClienteService {
     await this.auditService.create(auditItem);
 
     return await this.clienteRepoService.delete(id);
+  }
+
+  async getPropostas(reqUser: UsuarioEntity, id: number) {
+    let findClient = await this.clienteRepoService.findById(id);
+    if (!findClient) {
+      throw new NotFoundException('Usuário não encontrado!');
+    }
+
+    let auditItem = new CreateLogDto();
+    auditItem.tableName = 'CLIENTE';
+    auditItem.action = 'PROPOSTAS_CLIENTE';
+    auditItem.idInTable = findClient.id;
+    auditItem.userId = reqUser.id;
+    auditItem.userName = reqUser.name;
+
+    await this.auditService.create(auditItem);
+
+    return await this.propostaService.getPropopostasByCliendId(id);
   }
 }

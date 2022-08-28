@@ -6,9 +6,11 @@ import { ClienteEntity } from './entities/cliente.entity';
 import { ClienteRepoService } from './cliente.repository';
 import { UsuarioModule } from 'src/usuario/usuario.module';
 import { AuditModule } from 'src/audit/audit.module';
+import { PropostaComercialModule } from 'src/proposta-comercial/proposta-comercial.module';
 
 @Module({
   imports: [
+    PropostaComercialModule,
     AuditModule,
     UsuarioModule,
     TypeOrmModule.forFeature([ClienteEntity]),

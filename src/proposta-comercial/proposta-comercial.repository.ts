@@ -46,4 +46,10 @@ export class PropostaComercialRepoService {
     await this.propostaComercialRepoService.delete(id);
     return true;
   }
+
+  async getPropostasByCliendId(id: number): Promise<PropostaComercialEntity[]> {
+    return await this.propostaComercialRepoService.find({
+      where: { cliente: id },
+    });
+  }
 }

@@ -10,6 +10,6 @@ import { AuditModule } from 'src/audit/audit.module';
   imports: [AuditModule, TypeOrmModule.forFeature([PropostaComercialEntity])],
   controllers: [PropostaComercialController],
   providers: [PropostaComercialService, PropostaComercialRepoService],
-  exports: [PropostaComercialService],
+  exports: [PropostaComercialService, PropostaComercialRepoService],
 })
 export class PropostaComercialModule {}

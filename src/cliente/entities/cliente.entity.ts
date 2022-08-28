@@ -31,6 +31,8 @@ export class ClienteEntity {
   @ManyToOne(() => UsuarioEntity, (usuario) => usuario.clientes)
   internalResponsible: UsuarioEntity;
 
-  @OneToMany(() => PropostaComercialEntity, (proposta) => proposta.cliente)
+  @OneToMany(() => PropostaComercialEntity, (proposta) => proposta.cliente, {
+    eager: true,
+  })
   propostas: PropostaComercialEntity[];
 }

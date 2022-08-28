@@ -88,4 +88,16 @@ export class PropostaComercialService {
 
     return await this.propostaComercialRepoService.delete(id);
   }
+
+  async getPropopostasByCliendId(
+    id: number,
+  ): Promise<PropostaComercialEntity[]> {
+    let findPropostas =
+      await this.propostaComercialRepoService.getPropostasByCliendId(id);
+    if (findPropostas.length === 0) {
+      throw new NotFoundException('Não existem propostas para este cliente!');
+    }
+
+    return findPropostas;
+  }
 }
