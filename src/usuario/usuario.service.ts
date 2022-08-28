@@ -38,6 +38,16 @@ export class UsuarioService {
     if (findUser) {
       throw new ConflictException('Este usuário já existe na base de dados!');
     }
+
+    let regex =
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-+_!@#$%^&*.,?])(?!.*[\s]).+$/;
+
+    if (!regex.test(createUsuarioDto.password)) {
+      throw new BadRequestException(
+        'Formato de senha inválido! A senha deve ter no mínimo 8 caracteres, atendendo aos critérios: ao menos 1 letra maiúscula, ao menos 1 letra minúscula, no mínimo 1 digito numérico. Caracteres em branco não são aceitos!',
+      );
+    }
+
     const hashPassword = await this.hasher(createUsuarioDto.password);
     createUsuarioDto.password = hashPassword;
 
