@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  psql_db:
+    container_name: valida_web
+    image: postgres:14
+    volumes:
+      - psql-db-data:/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=valida_web
+    ports:
+      - 5432:5432
+
+volumes:
+  psql-db-data:
+
+networks:
+  app-connect:
+    driver: bridge

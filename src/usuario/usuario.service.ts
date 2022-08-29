@@ -1,171 +1,178 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
+	BadRequestException,
+	ConflictException,
+	Inject,
+	Injectable,
+	NotFoundException,
 } from '@nestjs/common';
-import { AuditRepoService } from 'src/audit/audit.repository';
+
 import { AuditService } from 'src/audit/audit.service';
 import { CreateLogDto } from 'src/audit/dto/create-log.dto';
 import { AuthService } from 'src/auth/shared/auth.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { FindByEmailDto } from './dto/find-by-email.dto';
 import { LoginUserResponseDto } from './dto/login-response.dto';
-import { LoginDto } from './dto/login.dto';
-import { updatePasswordDto } from './dto/update-password.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { UsuarioRepoService } from './usuario.repository';
 
 @Injectable()
 export class UsuarioService {
-  constructor(
-    @Inject(UsuarioRepoService)
-    private readonly usuarioRepoService: UsuarioRepoService,
-    private readonly auditService: AuditService,
-    private authService: AuthService,
-  ) {}
+	constructor(
+		@Inject(UsuarioRepoService)
+		private readonly usuarioRepoService: UsuarioRepoService,
+		private readonly auditService: AuditService,
+		private authService: AuthService,
+	) {}
 
-  async create(
-    reqUser: UsuarioEntity,
-    createUsuarioDto: CreateUsuarioDto,
-  ): Promise<UsuarioEntity> {
-    let findUser = await this.usuarioRepoService.findByEmail(
-      createUsuarioDto.email,
-    );
-    if (findUser) {
-      throw new ConflictException('Este usuário já existe na base de dados!');
-    }
+	async create(
+		reqUser: UsuarioEntity,
+		createUsuarioDto: CreateUsuarioDto,
+	): Promise<UsuarioEntity> {
+		const findUser = await this.usuarioRepoService.findByEmail(
+			createUsuarioDto.email,
+		);
+		if (findUser) {
+			throw new ConflictException(
+				'Este usuário já existe na base de dados!',
+			);
+		}
 
-    let regex =
-      /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-+_!@#$%^&*.,?])(?!.*[\s]).+$/;
+		const regex =
+			/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-+_!@#$%^&*.,?])(?!.*[\s]).+$/;
 
-    if (!regex.test(createUsuarioDto.password)) {
-      throw new BadRequestException(
-        'Formato de senha inválido! A senha deve ter no mínimo 8 caracteres, atendendo aos critérios: ao menos 1 letra maiúscula, ao menos 1 letra minúscula, no mínimo 1 digito numérico. Caracteres em branco não são aceitos!',
-      );
-    }
+		if (!regex.test(createUsuarioDto.password)) {
+			throw new BadRequestException(
+				'Formato de senha inválido! A senha deve ter no mínimo 8 caracteres, atendendo aos critérios: ao menos 1 letra maiúscula, ao menos 1 letra minúscula, no mínimo 1 digito numérico. Caracteres em branco não são aceitos!',
+			);
+		}
 
-    const hashPassword = await this.hasher(createUsuarioDto.password);
-    createUsuarioDto.password = hashPassword;
+		const hashPassword = await this.hasher(createUsuarioDto.password);
+		createUsuarioDto.password = hashPassword;
 
-    let createdUser = await this.usuarioRepoService.create(createUsuarioDto);
+		console.log(hashPassword);
 
-    let auditItem = new CreateLogDto();
-    auditItem.tableName = 'USUARIO';
-    auditItem.action = 'CREATE_USER';
-    auditItem.idInTable = createdUser.id;
-    auditItem.userId = reqUser.id;
-    auditItem.userName = reqUser.name;
+		const createdUser = await this.usuarioRepoService.create(
+			createUsuarioDto,
+		);
 
-    await this.auditService.create(auditItem);
+		const auditItem = new CreateLogDto();
+		auditItem.tableName = 'USUARIO';
+		auditItem.action = 'CREATE_USER';
+		auditItem.idInTable = createdUser.id;
+		auditItem.userId = reqUser.id;
+		auditItem.userName = reqUser.name;
 
-    return createdUser;
-  }
+		await this.auditService.create(auditItem);
 
-  async login(loginUser: UsuarioEntity): Promise<LoginUserResponseDto> {
-    const accessToken: string = await this.authService.login(loginUser);
-    return { accessToken };
-  }
+		return createdUser;
+	}
 
-  async findAll(): Promise<UsuarioEntity[]> {
-    return await this.usuarioRepoService.findAll();
-  }
+	async login(loginUser: UsuarioEntity): Promise<LoginUserResponseDto> {
+		const accessToken: string = await this.authService.login(loginUser);
+		return { accessToken };
+	}
 
-  async findOne(id: number): Promise<UsuarioEntity> {
-    let findUser = await this.usuarioRepoService.findById(id);
-    if (!findUser) {
-      throw new NotFoundException('Usuário não encontrado!');
-    }
+	async findAll(): Promise<UsuarioEntity[]> {
+		return await this.usuarioRepoService.findAll();
+	}
 
-    return findUser;
-  }
+	async findOne(id: number): Promise<UsuarioEntity> {
+		const findUser = await this.usuarioRepoService.findById(id);
+		if (!findUser) {
+			throw new NotFoundException('Usuário não encontrado!');
+		}
 
-  async update(
-    reqUser: UsuarioEntity,
-    id: number,
-    updateUsuarioDto: UpdateUsuarioDto,
-  ): Promise<any> {
-    let findUser = await this.usuarioRepoService.findById(id);
-    if (!findUser) {
-      throw new NotFoundException('Usuário não encontrado!');
-    }
+		return findUser;
+	}
 
-    let auditItem = new CreateLogDto();
-    auditItem.tableName = 'USUARIO';
-    auditItem.action = 'UPDATE_USER';
-    auditItem.idInTable = findUser.id;
-    auditItem.userId = reqUser.id;
-    auditItem.userName = reqUser.name;
-    await this.auditService.create(auditItem);
+	async update(
+		reqUser: UsuarioEntity,
+		id: number,
+		updateUsuarioDto: UpdateUsuarioDto,
+	): Promise<any> {
+		const findUser = await this.usuarioRepoService.findById(id);
+		if (!findUser) {
+			throw new NotFoundException('Usuário não encontrado!');
+		}
 
-    updateUsuarioDto.password = findUser.password;
+		const auditItem = new CreateLogDto();
+		auditItem.tableName = 'USUARIO';
+		auditItem.action = 'UPDATE_USER';
+		auditItem.idInTable = findUser.id;
+		auditItem.userId = reqUser.id;
+		auditItem.userName = reqUser.name;
+		await this.auditService.create(auditItem);
 
-    return await this.usuarioRepoService.update(findUser.id, updateUsuarioDto);
-  }
+		updateUsuarioDto.password = findUser.password;
 
-  async findByEmail(email: string): Promise<UsuarioEntity> {
-    let findUser = await this.usuarioRepoService.findByEmail(email);
-    if (!findUser) {
-      throw new NotFoundException('Usuario não encontrado!');
-    }
-    return findUser;
-  }
+		return await this.usuarioRepoService.update(
+			findUser.id,
+			updateUsuarioDto,
+		);
+	}
 
-  async updatePasword(
-    reqUser: UsuarioEntity,
-    id: number,
-    updatePasswordDto: updatePasswordDto,
-  ) {
-    let findUser = await this.usuarioRepoService.findById(id);
-    if (!findUser) {
-      throw new NotFoundException('Usuário não encontrado!');
-    }
+	async findByEmail(email: string): Promise<UsuarioEntity> {
+		const findUser = await this.usuarioRepoService.findByEmail(email);
+		if (!findUser) {
+			throw new NotFoundException('Usuario não encontrado!');
+		}
+		return findUser;
+	}
 
-    let updatePassword = await this.hasher(updatePasswordDto.password);
+	async updatePasword(
+		reqUser: UsuarioEntity,
+		id: number,
+		updatePasswordDto: UpdatePasswordDto,
+	) {
+		const findUser = await this.usuarioRepoService.findById(id);
+		if (!findUser) {
+			throw new NotFoundException('Usuário não encontrado!');
+		}
 
-    let auditItem = new CreateLogDto();
-    auditItem.tableName = 'USUARIO';
-    auditItem.action = 'UPDATE_USER_PASSWORD';
-    auditItem.idInTable = findUser.id;
-    auditItem.userId = reqUser.id;
-    auditItem.userName = reqUser.name;
-    await this.auditService.create(auditItem);
+		const updatePassword = await this.hasher(updatePasswordDto.password);
 
-    await this.usuarioRepoService.updatePassword(id, updatePassword);
+		const auditItem = new CreateLogDto();
+		auditItem.tableName = 'USUARIO';
+		auditItem.action = 'UPDATE_USER_PASSWORD';
+		auditItem.idInTable = findUser.id;
+		auditItem.userId = reqUser.id;
+		auditItem.userName = reqUser.name;
+		await this.auditService.create(auditItem);
 
-    return await this.usuarioRepoService.findById(id);
-  }
+		await this.usuarioRepoService.updatePassword(id, updatePassword);
 
-  async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
-    let findUser = await this.usuarioRepoService.findById(id);
-    if (!findUser) {
-      throw new NotFoundException('Usuário não encontrado!');
-    }
+		return await this.usuarioRepoService.findById(id);
+	}
 
-    if (findUser.clientes.length > 0) {
-      throw new BadRequestException(
-        'Não é possível excluir usuário responsável por clientes!',
-      );
-    }
+	async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
+		const findUser = await this.usuarioRepoService.findById(id);
+		if (!findUser) {
+			throw new NotFoundException('Usuário não encontrado!');
+		}
 
-    let auditItem = new CreateLogDto();
-    auditItem.tableName = 'USUARIO';
-    auditItem.action = 'DELETE_USER';
-    auditItem.idInTable = findUser.id;
-    auditItem.userId = reqUser.id;
-    auditItem.userName = reqUser.name;
-    await this.auditService.create(auditItem);
+		if (findUser.clientes.length > 0) {
+			throw new BadRequestException(
+				'Não é possível excluir usuário responsável por clientes!',
+			);
+		}
 
-    return await this.usuarioRepoService.delete(id);
-  }
+		const auditItem = new CreateLogDto();
+		auditItem.tableName = 'USUARIO';
+		auditItem.action = 'DELETE_USER';
+		auditItem.idInTable = findUser.id;
+		auditItem.userId = reqUser.id;
+		auditItem.userName = reqUser.name;
+		await this.auditService.create(auditItem);
 
-  hasher(text: string): Promise<string> {
-    const crypto = require('crypto');
-    const sha256Hash = crypto.createHash('sha256');
-    const hashPassword = sha256Hash.update(text).digest('hex');
-    return hashPassword;
-  }
+		return await this.usuarioRepoService.delete(id);
+	}
+
+	hasher(text: string): Promise<string> {
+		const crypto = require('crypto');
+		const sha256Hash = crypto.createHash('sha256');
+		const hashPassword = sha256Hash.update(text).digest('hex');
+		return hashPassword;
+	}
 }

@@ -11,36 +11,34 @@ import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: './.env' }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      synchronize: false,
-      logging: true,
-      entities: ['./dist/**/entities/*.entity.{js,ts}'],
-      migrations: ['src/migration/**/*.js'],
-      subscribers: ['src/subscriber/**/*.{js,ts}'],
-      cli: {
-        entitiesDir: 'src/**/entity',
-        migrationsDir: 'src/_shared/migration',
-        subscribersDir: 'src/subscriber',
-      },
-    }),
-    ClienteModule,
-    UsuarioModule,
-    PropostaComercialModule,
-    AuditModule,
-    AuthModule,
-  ],
-  controllers: [
-    ClienteController,
-    UsuarioController,
-    PropostaComercialController,
-  ],
+	imports: [
+		ConfigModule.forRoot({ isGlobal: true, envFilePath: './.env' }),
+		TypeOrmModule.forRoot({
+			type: 'postgres',
+			host: process.env.DB_HOST,
+			port: process.env.DB_PORT,
+			username: process.env.DB_USER,
+			password: process.env.DB_PASS,
+			database: process.env.DB_NAME,
+			logging: true,
+			entities: ['dist/**/entities/*.entity.{js,ts}'],
+			migrations: ['dist/migration/*.js'],
+			subscribers: ['src/subscriber/**/*.{js,ts}'],
+			migrationsTableName: 'migration_table',
+			cli: {
+				migrationsDir: 'src/migration',
+			},
+		}),
+		ClienteModule,
+		UsuarioModule,
+		PropostaComercialModule,
+		AuditModule,
+		AuthModule,
+	],
+	controllers: [
+		ClienteController,
+		UsuarioController,
+		PropostaComercialController,
+	],
 })
 export class AppModule {}
