@@ -8,41 +8,47 @@ import { ClienteEntity } from './entities/cliente.entity';
 
 @Injectable()
 export class ClienteRepoService {
-  constructor(
-    @InjectRepository(ClienteEntity)
-    private clienteRepository: Repository<ClienteEntity>,
-  ) {}
+	constructor(
+		@InjectRepository(ClienteEntity)
+		private clienteRepository: Repository<ClienteEntity>,
+	) {}
 
-  async create(clienteDto: CreateClienteDto): Promise<ClienteEntity> {
-    return await this.clienteRepository.save(clienteDto);
-  }
+	async create(clienteDto: CreateClienteDto): Promise<ClienteEntity> {
+		return await this.clienteRepository.save(clienteDto);
+	}
 
-  async findById(id: number): Promise<ClienteEntity> {
-    return await this.clienteRepository.findOne({ where: { id: id } });
-  }
+	async findById(id: number): Promise<ClienteEntity> {
+		return await this.clienteRepository.findOne({
+			relations: ['internalResponsible'],
+			where: { id: id },
+		});
+	}
 
-  async findAll(): Promise<ClienteEntity[]> {
-    return await this.clienteRepository.find();
-  }
+	async findAll(): Promise<ClienteEntity[]> {
+		return await this.clienteRepository.find({
+			relations: ['internalResponsible'],
+		});
+	}
 
-  async findByDocument(document: string): Promise<ClienteEntity> {
-    return await this.clienteRepository.findOne({
-      where: { document: document },
-    });
-  }
+	async findByDocument(document: string): Promise<ClienteEntity> {
+		return await this.clienteRepository.findOne({
+			relations: ['internalResponsible'],
+			where: { document: document },
+		});
+	}
 
-  async delete(id: number): Promise<boolean> {
-    await this.clienteRepository.delete(id);
-    return true;
-  }
+	async delete(id: number): Promise<boolean> {
+		await this.clienteRepository.delete(id);
+		return true;
+	}
 
-  async update(
-    id: number,
-    updateClienteDto: UpdateClienteDto,
-  ): Promise<ClienteEntity> {
-    let updateClient = new ClienteEntity();
-    updateClient = Object.assign(updateClient, updateClienteDto);
-    await this.clienteRepository.update(id, updateClient);
-    return await this.findById(id);
-  }
+	async update(
+		id: number,
+		updateClienteDto: UpdateClienteDto,
+	): Promise<ClienteEntity> {
+		let updateClient = new ClienteEntity();
+		updateClient = Object.assign(updateClient, updateClienteDto);
+		await this.clienteRepository.update(id, updateClient);
+		return await this.findById(id);
+	}
 }
