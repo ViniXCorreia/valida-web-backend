@@ -1,28 +1,28 @@
 import { ClienteEntity } from 'src/cliente/entities/cliente.entity';
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
+	Column,
+	CreateDateColumn,
+	Entity,
+	ManyToOne,
+	PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity({ name: 'proposta-comercial' })
 export class PropostaComercialEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @Column()
-  description: string;
+	@Column()
+	description: string;
 
-  @CreateDateColumn()
-  createDate: Date;
+	@CreateDateColumn()
+	createDate: Date;
 
-  @Column()
-  status: string;
+	@Column()
+	status: string;
 
-  @ManyToOne(() => ClienteEntity, (cliente) => cliente.propostas, {
-    onDelete: 'CASCADE',
-  })
-  cliente: ClienteEntity;
+	@ManyToOne(() => ClienteEntity, (cliente) => cliente.propostas, {
+		onDelete: 'CASCADE',
+	})
+	cliente: ClienteEntity;
 }
