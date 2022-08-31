@@ -54,18 +54,10 @@ export class UsuarioController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Put('/usuario/:id')
-	update(
-		@Param('id') id: string,
-		@Body() updatePasswordDto: UpdatePasswordDto,
-		@Request() req,
-	) {
+	@Put('/usuario/alteraSenha')
+	update(@Body() updatePasswordDto: UpdatePasswordDto, @Request() req) {
 		const reqUser = req.user;
-		return this.usuarioService.updatePasword(
-			reqUser,
-			+id,
-			updatePasswordDto,
-		);
+		return this.usuarioService.updatePasword(reqUser, updatePasswordDto);
 	}
 
 	@UseGuards(JwtAuthGuard)

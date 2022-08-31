@@ -123,15 +123,19 @@ export class UsuarioService {
 
 	async updatePasword(
 		reqUser: UsuarioEntity,
-		id: number,
 		updatePasswordDto: UpdatePasswordDto,
 	) {
-		const findUser = await this.usuarioRepoService.findById(id);
+		const findUser = await this.usuarioRepoService.findById(reqUser.id);
 		if (!findUser) {
 			throw new NotFoundException('Usuário não encontrado!');
 		}
 
 		const updatePassword = await this.hasher(updatePasswordDto.password);
+
+		await this.usuarioRepoService.updatePassword(
+			reqUser.id,
+			updatePassword,
+		);
 
 		const auditItem = new CreateLogDto();
 		auditItem.tableName = 'USUARIO';
@@ -141,9 +145,7 @@ export class UsuarioService {
 		auditItem.userName = reqUser.name;
 		await this.auditService.create(auditItem);
 
-		await this.usuarioRepoService.updatePassword(id, updatePassword);
-
-		return await this.usuarioRepoService.findById(id);
+		return await this.usuarioRepoService.findById(reqUser.id);
 	}
 
 	async remove(reqUser: UsuarioEntity, id: number): Promise<boolean> {
