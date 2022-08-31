@@ -97,6 +97,19 @@ export class UsuarioService {
 			throw new NotFoundException('Usuário não encontrado!');
 		}
 
+		if (updateUsuarioDto.password) {
+			const regex =
+				/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-+_!@#$%^&*.,?])(?!.*[\s]).+$/;
+
+			if (!regex.test(updateUsuarioDto.password)) {
+				throw new BadRequestException(
+					'Formato de senha inválido! A senha deve ter no mínimo 8 caracteres, atendendo aos critérios: ao menos 1 letra maiúscula, ao menos 1 letra minúscula, no mínimo 1 digito numérico. Caracteres em branco não são aceitos!',
+				);
+			}
+			const newPass = await this.hasher(updateUsuarioDto.password);
+			updateUsuarioDto.password = newPass;
+		}
+
 		const auditItem = new CreateLogDto();
 		auditItem.tableName = 'USUARIO';
 		auditItem.action = 'UPDATE_USER';
@@ -104,8 +117,6 @@ export class UsuarioService {
 		auditItem.userId = reqUser.id;
 		auditItem.userName = reqUser.name;
 		await this.auditService.create(auditItem);
-
-		updateUsuarioDto.password = findUser.password;
 
 		return await this.usuarioRepoService.update(
 			findUser.id,
