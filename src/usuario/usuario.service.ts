@@ -130,6 +130,15 @@ export class UsuarioService {
 			throw new NotFoundException('Usuário não encontrado!');
 		}
 
+		const regex =
+			/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-+_!@#$%^&*.,?])(?!.*[\s]).+$/;
+
+		if (!regex.test(updatePasswordDto.password)) {
+			throw new BadRequestException(
+				'Formato de senha inválido! A senha deve ter no mínimo 8 caracteres, atendendo aos critérios: ao menos 1 letra maiúscula, ao menos 1 letra minúscula, no mínimo 1 digito numérico. Caracteres em branco não são aceitos!',
+			);
+		}
+
 		const updatePassword = await this.hasher(updatePasswordDto.password);
 
 		await this.usuarioRepoService.updatePassword(
